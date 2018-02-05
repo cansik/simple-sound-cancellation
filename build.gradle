@@ -36,6 +36,9 @@ dependencies {
 
     // minim
     compile group: 'net.compartmental.code', name: 'minim', version: '2.2.2'
+
+    // grafica
+    compile files('libs/grafica/grafica.jar')
 }
 
 compileKotlin {

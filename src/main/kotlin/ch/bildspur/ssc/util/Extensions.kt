@@ -8,6 +8,11 @@ import java.util.*
 /**
  * Created by cansik on 04.02.17.
  */
+fun Int.incMod(maximum : Int, incValue : Int = 1) : Int
+{
+    return Math.floorMod(this + incValue, maximum)
+}
+
 fun Double.format(digits: Int) = java.lang.String.format("%.${digits}f", this)
 
 fun Float.format(digits: Int) = java.lang.String.format("%.${digits}f", this)
