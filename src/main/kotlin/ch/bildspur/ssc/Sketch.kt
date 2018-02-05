@@ -1,6 +1,5 @@
 package ch.bildspur.ssc
 
-import ch.bildspur.ssc.sound.CircularBuffer
 import ch.bildspur.ssc.util.ExponentialMovingAverage
 import ch.bildspur.ssc.util.format
 import grafica.GPlot
@@ -16,9 +15,9 @@ class Sketch : PApplet() {
         val HIGH_RES_FRAME_RATE = 30f
 
         @JvmStatic
-        val WINDOW_WIDTH = 800
+        val WINDOW_WIDTH = 520
         @JvmStatic
-        val WINDOW_HEIGHT = 600
+        val WINDOW_HEIGHT = 880
 
         @JvmStatic
         val NAME = "Simple Sound Cancellation"
@@ -39,6 +38,7 @@ class Sketch : PApplet() {
     // plots
     lateinit var backgroundPlot : GPlot
     lateinit var inputPlot : GPlot
+    lateinit var cancelPlot : GPlot
 
     init {
     }
@@ -58,10 +58,10 @@ class Sketch : PApplet() {
 
     override fun setup() {
         frameRate(HIGH_RES_FRAME_RATE)
-        //colorMode(HSB, 360f, 100f, 100f)
 
         backgroundPlot = GPlot(this, 25f, 15f)
         inputPlot = GPlot(this, 25f, 15f + 250f)
+        cancelPlot = GPlot(this, 25f, 15f + 500f)
 
         backgroundPlot.let {
             it.setTitleText("Background Noise")
@@ -83,6 +83,16 @@ class Sketch : PApplet() {
             it.fixedYLim = true
         }
 
+        cancelPlot.let {
+            it.setTitleText("Canceled Plot")
+            it.xAxis.setAxisLabelText("Time (t)")
+            it.yAxis.setAxisLabelText("Amplitude (a)")
+            it.setPointSize(0.0f)
+            it.setLineColor(color(61.0f, 152.0f, 112.0f))
+            it.yLim = arrayOf(-1f, 1f).toFloatArray()
+            it.fixedYLim = true
+        }
+
         cancellationTest.setup()
     }
 
@@ -96,14 +106,25 @@ class Sketch : PApplet() {
 
     private fun visualiseBuffer()
     {
-        backgroundPlot.points = GPointsArray(cancellationTest.backgroundBuffer.
-                reversed().mapIndexed { i, v -> GPoint(i.toFloat(), v) }.toTypedArray())
+        val n = 100
+        backgroundPlot.points = GPointsArray(cancellationTest.backgroundBuffer
+                .filterIndexed { i, v -> i % n == 0}
+                .reversed()
+                .mapIndexed { i, v -> GPoint(i.toFloat(), v) }.toTypedArray())
 
-        inputPlot.points = GPointsArray(cancellationTest.inputBuffer.
-                reversed().mapIndexed { i, v -> GPoint(i.toFloat(), v) }.toTypedArray())
+        inputPlot.points = GPointsArray(cancellationTest.inputBuffer
+                .filterIndexed { i, v -> i % n == 0}
+                .reversed()
+                .mapIndexed { i, v -> GPoint(i.toFloat(), v) }.toTypedArray())
+
+        cancelPlot.points = GPointsArray(cancellationTest.cancellationListener.result
+                .filterIndexed { i, v -> i % n == 0}
+                .reversed()
+                .mapIndexed { i, v -> GPoint(i.toFloat(), v) }.toTypedArray())
 
         backgroundPlot.defaultDraw()
         inputPlot.defaultDraw()
+        cancelPlot.defaultDraw()
     }
 
     private fun drawFPS(pg: PGraphics) {
