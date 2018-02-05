@@ -1,59 +1,59 @@
 package ch.bildspur.ssc.sound
 
-class AudioExtensions {
-    fun FloatArray.autoCorrelate(x2: FloatArray): Pair<Int, Float> {
-        // define the size of the resulting correlation field
-        val corrSize = 2 * this.size
-        // create correlation vector
-        val out = FloatArray(corrSize)
-        // shift variable
-        var shift = this.size
-        var value: Float
-        var maxIndex = 0
-        var maxVal = 0f
+data class CorrelationResult(val delay : Int, val confidence : Float)
 
-        // we have push the signal from the left to the right
-        for (i in 0 until corrSize) {
-            value = 0f
-            // multiply sample by sample and sum up
-            for (k in this.indices) {
-                // x2 has reached his end - abort
-                if (k + shift > x2.size - 1) {
-                    break
-                }
+fun FloatArray.crossCorrelate(x2: FloatArray): CorrelationResult {
+    // define the size of the resulting correlation field
+    val corrSize = 2 * this.size
+    // create correlation vector
+    val out = FloatArray(corrSize)
+    // shift variable
+    var shift = this.size
+    var value: Float
+    var maxIndex = 0
+    var maxVal = 0f
 
-                // x2 has not started yet - continue
-                if (k + shift < 0) {
-                    continue
-                }
-
-                // multiply sample with sample and sum up
-                value += this[k] * x2[k + shift]
+    // we have push the signal from the left to the right
+    for (i in 0 until corrSize) {
+        value = 0f
+        // multiply sample by sample and sum up
+        for (k in this.indices) {
+            // x2 has reached his end - abort
+            if (k + shift > x2.size - 1) {
+                break
             }
-            // save the sample
-            out[i] = value
-            shift--
-            // save highest correlation index
-            if (out[i] > maxVal) {
-                maxVal = out[i]
-                maxIndex = i
+
+            // x2 has not started yet - continue
+            if (k + shift < 0) {
+                continue
             }
+
+            // multiply sample with sample and sum up
+            value += this[k] * x2[k + shift]
         }
-
-        // set the delay and confidence
-        return Pair(maxIndex - this.size, maxVal)
+        // save the sample
+        out[i] = value
+        shift--
+        // save highest correlation index
+        if (out[i] > maxVal) {
+            maxVal = out[i]
+            maxIndex = i
+        }
     }
 
-    fun FloatArray.linearWeightedAverage(): Double {
-        // gauss
-        val n = (this.size + 1).toDouble()
-        val divider = (Math.pow(n, 2.0) + n) / 2.0
+    // set the delay and confidence
+    return CorrelationResult(maxIndex - this.size, maxVal)
+}
 
-        // average
-        var sum = 0.0
-        for ((index, value) in this.withIndex())
-            sum += ((index + 1).toDouble() / divider) * value
+fun FloatArray.linearWeightedAverage(): Double {
+    // gauss
+    val n = (this.size + 1).toDouble()
+    val divider = (Math.pow(n, 2.0) + n) / 2.0
 
-        return sum
-    }
+    // average
+    var sum = 0.0
+    for ((index, value) in this.withIndex())
+        sum += ((index + 1).toDouble() / divider) * value
+
+    return sum
 }

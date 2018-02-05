@@ -17,7 +17,7 @@ class Sketch : PApplet() {
         @JvmStatic
         val WINDOW_WIDTH = 520
         @JvmStatic
-        val WINDOW_HEIGHT = 880
+        val WINDOW_HEIGHT = 950
 
         @JvmStatic
         val NAME = "Simple Sound Cancellation"
@@ -60,8 +60,8 @@ class Sketch : PApplet() {
         frameRate(HIGH_RES_FRAME_RATE)
 
         backgroundPlot = GPlot(this, 25f, 15f)
-        inputPlot = GPlot(this, 25f, 15f + 250f)
-        cancelPlot = GPlot(this, 25f, 15f + 500f)
+        inputPlot = GPlot(this, 25f, 15f + 300f)
+        cancelPlot = GPlot(this, 25f, 15f + 600f)
 
         backgroundPlot.let {
             it.setTitleText("Background Noise")
@@ -106,7 +106,7 @@ class Sketch : PApplet() {
 
     private fun visualiseBuffer()
     {
-        val n = 100
+        val n = 300
         backgroundPlot.points = GPointsArray(cancellationTest.backgroundBuffer
                 .filterIndexed { i, v -> i % n == 0}
                 .reversed()

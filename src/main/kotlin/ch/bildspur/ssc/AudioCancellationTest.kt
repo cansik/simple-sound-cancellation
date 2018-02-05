@@ -14,7 +14,7 @@ class AudioCancellationTest(applet : PApplet) {
         val DEFAULT_BUFFER_SIZE = 2048
 
         @JvmStatic
-        val DEFAULT_CIRCULAR_BUFFER_SIZE = DEFAULT_BUFFER_SIZE * 20
+        val DEFAULT_CIRCULAR_BUFFER_SIZE = DEFAULT_BUFFER_SIZE * 50
     }
 
     val minim = Minim(applet)
@@ -31,8 +31,9 @@ class AudioCancellationTest(applet : PApplet) {
 
     fun setup()
     {
-        backgroundAudio = minim.loadFile("SAVERNE_Hendrix.mp3", DEFAULT_BUFFER_SIZE)
-        backgroundAudio.skip(1000 * 10)
+        //backgroundAudio = minim.loadFile("SAVERNE_Hendrix.mp3", DEFAULT_BUFFER_SIZE)
+        backgroundAudio = minim.loadFile("clip.wav", DEFAULT_BUFFER_SIZE)
+        //backgroundAudio.skip(1000 * 10)
         backgroundAudio.play()
 
         input = minim.getLineIn(Minim.MONO, DEFAULT_BUFFER_SIZE)
